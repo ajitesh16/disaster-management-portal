@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Disaster Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .chart-card-body {
+            height: 320px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        .dashboard-scroll {
+            max-height: 260px;
+            overflow-y: auto;
+        }
+
+        .dashboard-scroll thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        .card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .btn {
+            transition: all 0.25s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .form-control,
+        .form-select {
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.12);
+        }
+
+        .btn-custom-yellow {
+            background-color: #d39e00;
+            color: #ffffff;
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-custom-yellow:hover {
+            background-color: #b8860b;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.14);
+        }
+
+        .btn-custom-yellow:focus,
+        .btn-custom-yellow:active {
+            background-color: #b8860b !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 0 0.2rem rgba(211, 158, 0, 0.22) !important;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .description-cell {
+            white-space: normal;
+            word-wrap: break-word;
+            max-width: 350px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">Admin Dashboard</a>
+            <div class="d-flex align-items-center gap-3">
+                <span id="userName" class="text-white fw-semibold"></span>
+                <button onclick="logout()" class="btn btn-outline-light btn-sm">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="row g-4 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card shadow border-0 rounded-4 text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total Disasters</h6>
+                        <h3 id="totalDisasters" class="fw-bold text-danger">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card shadow border-0 rounded-4 text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Reported</h6>
+                        <h3 id="reportedDisasters" class="fw-bold text-primary">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card shadow border-0 rounded-4 text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">In Progress</h6>
+                        <h3 id="inProgressDisasters" class="fw-bold text-warning">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card shadow border-0 rounded-4 text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Resolved</h6>
+                        <h3 id="resolvedDisasters" class="fw-bold text-success">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card shadow border-0 rounded-4 text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Help Requests</h6>
+                        <h3 id="totalRequests" class="fw-bold text-dark">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card shadow border-0 rounded-4 text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Pending</h6>
+                        <h3 id="pendingRequests" class="fw-bold text-primary">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card shadow border-0 rounded-4 text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Assigned</h6>
+                        <h3 id="assignedRequests" class="fw-bold text-warning">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-md-3">
+                <div class="card shadow border-0 rounded-4 text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Resolved Requests</h6>
+                        <h3 id="resolvedRequests" class="fw-bold text-success">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-lg-6">
+                <div class="card shadow border-0 rounded-4 h-100">
+                    <div class="card-body chart-card-body">
+                        <h5 class="card-title mb-3">Disaster Status Overview</h5>
+                        <div class="chart-wrapper">
+                            <canvas id="disasterChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="card shadow border-0 rounded-4 h-100">
+                    <div class="card-body chart-card-body">
+                        <h5 class="card-title mb-3">Help Request Status Overview</h5>
+                        <div class="chart-wrapper">
+                            <canvas id="helpChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-12 col-lg-6">
+                <div class="card shadow border-0 rounded-4 h-100">
+                    <div class="card-body">
+                        <h2 class="card-title mb-3">Add New Disaster</h2>
+                        <p class="text-muted small">You can type manually or tap the microphone button to speak.</p>
+
+                        <form id="disasterForm">
+                            <div class="mb-3">
+                                <label for="type" class="form-label">Disaster Type</label>
+                                <div class="input-group">
+                                    <input type="text" id="type" class="form-control" placeholder="e.g. Flood" required>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="startVoiceInput('type')">🎤</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Location</label>
+                                <div class="input-group">
+                                    <input type="text" id="location" class="form-control" placeholder="Location"
+                                        required>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="startVoiceInput('location')">🎤</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="severity" class="form-label">Severity</label>
+                                <select id="severity" class="form-select">
+                                    <option>Low</option>
+                                    <option>Medium</option>
+                                    <option>High</option>
+                                    <option>Critical</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <div class="input-group">
+                                    <input type="text" id="description" class="form-control" placeholder="Description"
+                                        required>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="startVoiceInput('description')">🎤</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Latitude</label>
+                                <input type="number" step="any" id="latitude" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Longitude</label>
+                                <input type="number" step="any" id="longitude" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Disaster Images</label>
+                                <input type="file" id="image1" class="form-control mb-2" accept="image/*">
+                                <input type="file" id="image2" class="form-control" accept="image/*">
+                                <small class="text-muted">Upload up to 2 images</small>
+                            </div>
+
+                            <button type="button" class="btn btn-danger w-100" onclick="addDisaster()">Add
+                                Disaster</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="card shadow border-0 rounded-4 h-100">
+                    <div class="card-body">
+                        <h2 class="card-title mb-3">Add Resource</h2>
+                        <p class="text-muted small">Voice input is available for resource name and unit.</p>
+
+                        <form id="resourceForm">
+                            <div class="mb-3">
+                                <label for="r_name" class="form-label">Resource Name</label>
+                                <div class="input-group">
+                                    <input type="text" id="r_name" class="form-control" placeholder="Name" required>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="startVoiceInput('r_name')">🎤</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="r_category" class="form-label">Category</label>
+                                <select id="r_category" class="form-select">
+                                    <option>Food</option>
+                                    <option>Water</option>
+                                    <option>Medical</option>
+                                    <option>Shelter</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="r_qty" class="form-label">Quantity</label>
+                                <input type="number" id="r_qty" class="form-control" placeholder="Quantity" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="r_unit" class="form-label">Unit</label>
+                                <div class="input-group">
+                                    <input type="text" id="r_unit" class="form-control" placeholder="e.g. Liters"
+                                        required>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="startVoiceInput('r_unit')">🎤</button>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-custom-yellow w-100" onclick="addResource()">Add
+                                Resource</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card shadow border-0 rounded-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="card-title mb-0">Disaster Records</h2>
+                            <small class="text-muted">Scroll to view all disaster records</small>
+                        </div>
+                        <div class="table-responsive dashboard-scroll">
+                            <table class="table table-bordered table-hover align-middle mb-0" id="disasterTable">
+                                <thead class="table-danger">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>Location</th>
+                                        <th>Severity</th>
+                                        <th>Status</th>
+                                        <th>Description</th>
+                                        <th>Images</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card shadow border-0 rounded-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="card-title mb-0">Help Requests (Assign Teams)</h2>
+                            <small class="text-muted">Scroll to view all help requests</small>
+                        </div>
+                        <div class="table-responsive dashboard-scroll">
+                            <table class="table table-bordered table-hover align-middle mb-0" id="helpTable">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Citizen Name</th>
+                                        <th>Disaster</th>
+                                        <th>Location</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Assigned Team</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card shadow border-0 rounded-4">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="card-title mb-0">Resource Inventory</h2>
+                            <small class="text-muted">Scroll to view all resources</small>
+                        </div>
+                        <div class="table-responsive dashboard-scroll">
+                            <table class="table table-bordered table-hover align-middle mb-0" id="resourceTable">
+                                <thead class="table-warning">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Category</th>
+                                        <th>Quantity</th>
+                                        <th>Unit</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let disasterChartInstance = null;
+        let helpChartInstance = null;
+
+        function checkAuth() {
+            fetch('auth')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status !== 'success' || data.role !== 'Admin') {
+                        window.location.href = 'admin_login.html';
+                        return;
+                    }
+                    document.getElementById('userName').innerText = 'Welcome, ' + data.name;
+                })
+                .catch(() => {
+                    window.location.href = 'admin_login.html';
+                });
+        }
+
+        function logout() {
+            fetch('auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=logout'
+            }).then(() => window.location.href = 'admin_login.html');
+        }
+
+        function getStatusBadge(status) {
+            if (status === 'Reported') return '<span class="badge bg-primary">Reported</span>';
+            if (status === 'In Progress') return '<span class="badge bg-warning text-dark">In Progress</span>';
+            if (status === 'Resolved') return '<span class="badge bg-success">Resolved</span>';
+            if (status === 'Pending') return '<span class="badge bg-primary">Pending</span>';
+            if (status === 'Assigned') return '<span class="badge bg-warning text-dark">Assigned</span>';
+            return `<span class="badge bg-dark">${status}</span>`;
+        }
+
+        function updateDisasterStatus(id, status) {
+            fetch('disaster', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'update_status',
+                    id: id,
+                    status: status
+                })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loadDisasters();
+                    } else {
+                        alert(data.message || 'Failed to update disaster status.');
+                    }
+                })
+                .catch(() => {
+                    alert('Server error while updating disaster status.');
+                });
+        }
+
+        function loadDisasters() {
+            fetch('disaster')
+                .then(r => r.json())
+                .then(data => {
+                    const rows = data.map(d => `
+<tr>
+    <td>${d.id}</td>
+    <td>${d.type}</td>
+    <td>${d.location}</td>
+    <td>${d.severity}</td>
+    <td>${getStatusBadge(d.status)}</td>
+    <td>${d.description || 'N/A'}</td>
+    <td>
+        <div class="d-flex gap-2 flex-wrap">
+            ${d.imagePath ? `<img src="${d.imagePath}" style="width:70px; height:70px; object-fit:cover; border-radius:8px;">` : ''}
+            ${d.imagePath2 ? `<img src="${d.imagePath2}" style="width:70px; height:70px; object-fit:cover; border-radius:8px;">` : ''}
+            ${!d.imagePath && !d.imagePath2 ? 'No Image' : ''}
+        </div>
+    </td>
+    <td>
+        <select class="form-select form-select-sm" onchange="updateDisasterStatus(${d.id}, this.value)">
+            <option value="Reported" ${d.status === 'Reported' ? 'selected' : ''}>Reported</option>
+            <option value="In Progress" ${d.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+            <option value="Resolved" ${d.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+        </select>
+    </td>
+</tr>
+`).join('');
+
+                    document.getElementById('disasterTable').innerHTML = `
+                <thead class="table-danger">
+                    <tr>
+                        <th>ID</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>Images</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            `;
+
+                    updateDisasterAnalytics(data);
+                })
+                .catch(() => {
+                    console.error('Failed to load disasters');
+                });
+        }
+
+        function addDisaster() {
+            const formData = new FormData();
+            formData.append('action', 'add');
+            formData.append('type', document.getElementById('type').value);
+            formData.append('location', document.getElementById('location').value);
+            formData.append('severity', document.getElementById('severity').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('latitude', document.getElementById('latitude').value);
+            formData.append('longitude', document.getElementById('longitude').value);
+
+            const image1 = document.getElementById('image1').files[0];
+            const image2 = document.getElementById('image2').files[0];
+
+            if (image1) formData.append('image1', image1);
+            if (image2) formData.append('image2', image2);
+
+            fetch('disaster', {
+                method: 'POST',
+                body: formData
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loadDisasters();
+                        document.getElementById('disasterForm').reset();
+                        alert('Disaster added successfully!');
+                    } else {
+                        alert(data.message || 'Failed to add disaster.');
+                    }
+                })
+                .catch(() => {
+                    alert('Server error while adding disaster.');
+                });
+        }
+
+        function loadResources() {
+            fetch('resource')
+                .then(r => r.json())
+                .then(data => {
+                    const rows = data.map(r => `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td>${r.name}</td>
+                        <td>${r.category}</td>
+                        <td>${r.quantity}</td>
+                        <td>${r.unit}</td>
+                    </tr>
+                `).join('');
+
+                    document.getElementById('resourceTable').innerHTML = `
+                    <thead class="table-warning">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Unit</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                `;
+                })
+                .catch(() => {
+                    console.error('Failed to load resources');
+                });
+        }
+
+        function addResource() {
+            fetch('resource', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'add',
+                    name: document.getElementById('r_name').value,
+                    category: document.getElementById('r_category').value,
+                    quantity: document.getElementById('r_qty').value,
+                    unit: document.getElementById('r_unit').value
+                })
+            }).then(() => {
+                loadResources();
+                document.getElementById('resourceForm').reset();
+            });
+        }
+
+        function loadHelpRequests() {
+            fetch('help-request')
+                .then(r => r.json())
+                .then(data => {
+                    const rows = data.map(h => `
+<tr>
+    <td>${h.id}</td>
+    <td>${h.citizenName}</td>
+    <td>${h.disasterType}</td>
+    <td>${h.location}</td>
+    <td class="description-cell">${h.description || 'N/A'}</td>
+    <td>${getStatusBadge(h.status)}</td>
+    <td>
+        <input type="text" class="form-control form-control-sm"
+               id="team-${h.id}"
+               value="${h.assignedTeam || ''}">
+    </td>
+    <td>
+        <select class="form-select form-select-sm" id="status-${h.id}">
+            <option value="Pending" ${h.status === 'Pending' ? 'selected' : ''}>Pending</option>
+            <option value="Assigned" ${h.status === 'Assigned' ? 'selected' : ''}>Assigned</option>
+            <option value="Resolved" ${h.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+        </select>
+        <button class="btn btn-sm btn-primary mt-1" onclick="updateStatus(${h.id})">Update</button>
+    </td>
+</tr>
+`).join('');
+
+                    document.getElementById('helpTable').innerHTML = `
+<thead class="table-primary">
+<tr>
+<th>ID</th>
+<th>Citizen Name</th>
+<th>Disaster</th>
+<th>Location</th>
+<th>Description</th>
+<th>Status</th>
+<th>Assigned Team</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>${rows}</tbody>
+`;
+
+                    updateHelpAnalytics(data);
+                })
+                .catch(() => {
+                    console.error('Failed to load help requests');
+                });
+        }
+
+        function updateStatus(id) {
+            fetch('help-request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'update_status',
+                    id: id,
+                    status: document.getElementById(`status-${id}`).value,
+                    assignedTeam: document.getElementById(`team-${id}`).value
+                })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loadHelpRequests();
+                    } else {
+                        alert(data.message || 'Failed to update help request.');
+                    }
+                })
+                .catch(() => {
+                    alert('Server error while updating help request.');
+                });
+        }
+
+        function updateDisasterAnalytics(data) {
+            const total = data.length;
+            const reported = data.filter(d => d.status === 'Reported').length;
+            const inProgress = data.filter(d => d.status === 'In Progress').length;
+            const resolved = data.filter(d => d.status === 'Resolved').length;
+
+            document.getElementById('totalDisasters').innerText = total;
+            document.getElementById('reportedDisasters').innerText = reported;
+            document.getElementById('inProgressDisasters').innerText = inProgress;
+            document.getElementById('resolvedDisasters').innerText = resolved;
+
+            const ctx = document.getElementById('disasterChart').getContext('2d');
+
+            if (disasterChartInstance) {
+                disasterChartInstance.destroy();
+            }
+
+            disasterChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Reported', 'In Progress', 'Resolved'],
+                    datasets: [{
+                        label: 'Disasters',
+                        data: [reported, inProgress, resolved],
+                        backgroundColor: [
+                            'rgba(13, 110, 253, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(25, 135, 84, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(13, 110, 253, 1)',
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(25, 135, 84, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateHelpAnalytics(data) {
+            const total = data.length;
+            const pending = data.filter(h => h.status === 'Pending').length;
+            const assigned = data.filter(h => h.status === 'Assigned').length;
+            const resolved = data.filter(h => h.status === 'Resolved').length;
+
+            document.getElementById('totalRequests').innerText = total;
+            document.getElementById('pendingRequests').innerText = pending;
+            document.getElementById('assignedRequests').innerText = assigned;
+            document.getElementById('resolvedRequests').innerText = resolved;
+
+            const ctx = document.getElementById('helpChart').getContext('2d');
+
+            if (helpChartInstance) {
+                helpChartInstance.destroy();
+            }
+
+            helpChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Pending', 'Assigned', 'Resolved'],
+                    datasets: [{
+                        data: [pending, assigned, resolved],
+                        backgroundColor: [
+                            'rgba(13, 110, 253, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(25, 135, 84, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(13, 110, 253, 1)',
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(25, 135, 84, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function startVoiceInput(fieldId) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+                alert('Voice input is not supported in this browser. Please use Google Chrome.');
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-IN';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            recognition.start();
+
+            recognition.onresult = function (event) {
+                const transcript = event.results[0][0].transcript;
+                const field = document.getElementById(fieldId);
+
+                if (!field) return;
+                field.value = transcript;
+            };
+
+            recognition.onerror = function () {
+                alert('Voice input failed. Please try again.');
+            };
+        }
+
+        window.onload = function () {
+            checkAuth();
+            loadDisasters();
+            loadResources();
+            loadHelpRequests();
+        };
+    </script>
+
+</body>
+
+</html>

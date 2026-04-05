@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Disaster Map</title>
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        .title-box {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px 22px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            font-weight: bold;
+            font-size: 18px;
+            color: #b02a37;
+            z-index: 999;
+        }
+
+        .nav-box {
+            position: absolute;
+            top: 15px;
+            right: 95px;
+            background: white;
+            padding: 10px 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            display: flex;
+            gap: 18px;
+            z-index: 999;
+        }
+
+        .nav-box a {
+            text-decoration: none;
+            font-weight: 600;
+            color: #b02a37;
+        }
+
+        .nav-box a:hover {
+            text-decoration: underline;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 25px;
+            left: 12px;
+            background: white;
+            padding: 12px 14px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+            font-size: 14px;
+            z-index: 999;
+        }
+
+        .legend div {
+            margin-bottom: 6px;
+        }
+
+        .legend div:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-card {
+            width: 240px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .info-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #b02a37;
+        }
+
+        .info-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .title-box {
+                top: 12px;
+                font-size: 16px;
+                padding: 8px 16px;
+            }
+
+            .nav-box {
+                top: 65px;
+                right: 12px;
+                left: 12px;
+                justify-content: center;
+                gap: 14px;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE"></script>
+</head>
+
+<body>
+
+    <div class="title-box">
+        Live Disaster Map
+    </div>
+
+    <div class="nav-box">
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+    </div>
+
+    <div class="legend">
+        <div><strong>Severity Legend</strong></div>
+        <div>🟢 Low</div>
+        <div>🟡 Medium</div>
+        <div>🟠 High</div>
+        <div>🔴 Critical</div>
+    </div>
+
+    <div id="map"></div>
+
+    <script>
+        let map;
+        let openInfoWindow = null;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 5,
+                center: { lat: 22.5937, lng: 78.9629 }
+            });
+
+            loadDisasters();
+        }
+
+        function getMarkerIcon(severity) {
+            let iconColor = "red";
+
+            if (severity === "Low") iconColor = "green";
+            else if (severity === "Medium") iconColor = "yellow";
+            else if (severity === "High") iconColor = "orange";
+            else if (severity === "Critical") iconColor = "red";
+
+            return "https://maps.google.com/mapfiles/ms/icons/" + iconColor + "-dot.png";
+        }
+
+        function loadDisasters() {
+            fetch('disaster')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(d => {
+                        if (typeof d.latitude !== 'number' || typeof d.longitude !== 'number') return;
+                        if (d.latitude === 0 && d.longitude === 0) return;
+
+                        const marker = new google.maps.Marker({
+                            position: {
+                                lat: d.latitude,
+                                lng: d.longitude
+                            },
+                            map: map,
+                            title: d.type + " - " + d.location,
+                            icon: getMarkerIcon(d.severity)
+                        });
+
+                        const imageHtml = d.imagePath
+                            ? `<img src="${d.imagePath}" alt="Disaster Image">`
+                            : '';
+
+                        const info = new google.maps.InfoWindow({
+                            content: `
+                        <div class="info-card">
+                            <h3>${d.type}</h3>
+                            ${imageHtml}
+                            <div><strong>Location:</strong> ${d.location}</div>
+                            <div><strong>Severity:</strong> ${d.severity}</div>
+                            <div><strong>Status:</strong> ${d.status}</div>
+                            <div><strong>Description:</strong> ${d.description || 'No description available'}</div>
+                        </div>
+                    `
+                        });
+
+                        marker.addListener("click", () => {
+                            if (openInfoWindow) {
+                                openInfoWindow.close();
+                            }
+                            info.open(map, marker);
+                            openInfoWindow = info;
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error("Error loading disasters:", error);
+                    alert("Could not load disaster data.");
+                });
+        }
+
+        window.onload = initMap;
+    </script>
+
+</body>
+
+</html>

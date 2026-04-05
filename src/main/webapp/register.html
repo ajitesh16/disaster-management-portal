@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Disaster Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+
+        .navbar-custom {
+            background: #dc3545;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+            border-color: #0d6efd;
+        }
+
+        .input-group button {
+            transition: all 0.25s ease;
+        }
+
+        .input-group button:hover {
+            background-color: #e9ecef;
+            transform: scale(1.05);
+        }
+
+        .subtle-note {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .register-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(40, 167, 69, 0.4);
+            background: linear-gradient(135deg, #218838, #1bbf9a);
+        }
+
+        .map-link-btn {
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .map-link-btn:hover {
+            background-color: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper .form-control {
+            padding-right: 3rem;
+        }
+
+        .password-eye {
+            position: absolute;
+            top: 50%;
+            right: 14px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+            font-size: 1.1rem;
+            z-index: 5;
+            transition: color 0.2s ease, transform 0.15s ease;
+            user-select: none;
+        }
+
+        .password-eye:hover {
+            color: #198754;
+        }
+
+        .password-eye:active {
+            transform: translateY(-50%) scale(0.9);
+        }
+
+        .caps-warning,
+        .match-message {
+            opacity: 0;
+            visibility: hidden;
+            max-height: 0;
+            overflow: hidden;
+            font-size: 0.8rem;
+            margin-top: 0;
+            transform: translateY(-4px);
+            transition: opacity 0.25s ease, transform 0.25s ease, max-height 0.25s ease, margin-top 0.25s ease, visibility 0.25s ease;
+        }
+
+        .caps-warning {
+            color: #dc3545;
+        }
+
+        .caps-warning.show,
+        .match-message.show {
+            opacity: 1;
+            visibility: visible;
+            max-height: 32px;
+            margin-top: 4px;
+            transform: translateY(0);
+        }
+
+        .caps-warning i,
+        .match-message i {
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+
+        .match-message.match-success {
+            color: #198754;
+        }
+
+        .match-message.match-error {
+            color: #dc3545;
+        }
+
+        #confirmPassword::placeholder {
+            font-style: italic;
+            color: #6c757d;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        #confirmPassword.is-valid,
+        #confirmPassword.is-invalid {
+            background-image: none !important;
+            padding-right: 3rem !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html">Disaster Management</a>
+            <a class="btn btn-outline-light map-link-btn" href="disaster_map.html">
+                View Live Disaster Map
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row justify-content-center align-items-center" style="min-height: 85vh;">
+            <div class="col-md-6 col-lg-4">
+
+                <div class="card shadow border-0 rounded-4">
+                    <div class="card-body p-4">
+
+                        <h2 class="text-center mb-2 fw-bold">Register</h2>
+                        <p class="text-center subtle-note mb-3">
+                            Create your account to request help and track updates
+                        </p>
+
+                        <form id="registerForm">
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Full Name</label>
+                                <div class="input-group">
+                                    <input type="text" id="name" class="form-control form-control-lg" required>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="startVoiceInput('name')">🎤</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email address</label>
+                                <div class="input-group">
+                                    <input type="email" id="email" class="form-control form-control-lg" required>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        onclick="startVoiceInput('email')">🎤</button>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Create Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="password" class="form-control form-control-lg" required
+                                        onkeyup="handlePasswordFieldEvents(event, 'password', 'capsWarningPassword')"
+                                        onkeydown="checkCapsLock(event, 'capsWarningPassword')"
+                                        onblur="hideCapsWarning('capsWarningPassword')">
+                                    <span class="password-eye" onmouseenter="handlePasswordHover('password', true)"
+                                        onmouseleave="handlePasswordHover('password', false)"
+                                        onclick="togglePasswordLock('password', this)">
+                                        <i class="bi bi-eye"></i>
+                                    </span>
+                                </div>
+                                <div id="capsWarningPassword" class="caps-warning">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Caps Lock is ON
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="confirmPassword" class="form-control form-control-lg"
+                                        placeholder="Re-enter your password" required
+                                        onkeyup="handlePasswordFieldEvents(event, 'confirmPassword', 'capsWarningConfirmPassword'); checkPasswordMatch();"
+                                        onkeydown="checkCapsLock(event, 'capsWarningConfirmPassword')"
+                                        onblur="hideCapsWarning('capsWarningConfirmPassword')">
+                                    <span class="password-eye"
+                                        onmouseenter="handlePasswordHover('confirmPassword', true)"
+                                        onmouseleave="handlePasswordHover('confirmPassword', false)"
+                                        onclick="togglePasswordLock('confirmPassword', this)">
+                                        <i class="bi bi-eye"></i>
+                                    </span>
+                                </div>
+                                <div id="capsWarningConfirmPassword" class="caps-warning">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Caps Lock is ON
+                                </div>
+                                <div id="matchMessage" class="match-message"></div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success w-100 btn-lg register-btn">
+                                Register
+                            </button>
+
+                        </form>
+
+                        <p id="msg" class="text-center mt-3 mb-0 text-danger"></p>
+
+                        <div class="text-center mt-3">
+                            <small>
+                                Already have an account?
+                                <a href="login.html" class="text-decoration-none fw-semibold">Login</a>
+                            </small>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const passwordLockState = {};
+
+        function startVoiceInput(fieldId) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            if (!SpeechRecognition) {
+                alert('Voice input is not supported in this browser. Please use Google Chrome.');
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-IN';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            recognition.start();
+
+            recognition.onresult = function (event) {
+                let transcript = event.results[0][0].transcript.trim();
+
+                if (fieldId === 'email') {
+                    transcript = transcript
+                        .toLowerCase()
+                        .replace(/\s+at\s+/g, '@')
+                        .replace(/\s+dot\s+/g, '.')
+                        .replace(/\s+/g, '');
+                }
+
+                const field = document.getElementById(fieldId);
+                if (field) field.value = transcript;
+            };
+
+            recognition.onerror = function () {
+                alert('Voice input failed. Please try again.');
+            };
+        }
+
+        function handlePasswordHover(inputId, isHovering) {
+            const input = document.getElementById(inputId);
+            const isLocked = passwordLockState[inputId] || false;
+
+            if (!isLocked) {
+                input.type = isHovering ? 'text' : 'password';
+            }
+        }
+
+        function togglePasswordLock(inputId, eyeElement) {
+            const input = document.getElementById(inputId);
+            const icon = eyeElement.querySelector('i');
+
+            passwordLockState[inputId] = !passwordLockState[inputId];
+
+            if (passwordLockState[inputId]) {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+
+        function checkCapsLock(event, warningId) {
+            const warning = document.getElementById(warningId);
+
+            if (event.getModifierState && event.getModifierState('CapsLock')) {
+                warning.classList.add('show');
+            } else {
+                warning.classList.remove('show');
+            }
+        }
+
+        function hideCapsWarning(warningId) {
+            document.getElementById(warningId).classList.remove('show');
+        }
+
+        function handlePasswordFieldEvents(event, inputId, warningId) {
+            checkCapsLock(event, warningId);
+            checkPasswordMatch();
+        }
+
+        function checkPasswordMatch() {
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            const matchMessage = document.getElementById('matchMessage');
+
+            confirmPassword.classList.remove('is-valid', 'is-invalid');
+            matchMessage.classList.remove('show', 'match-success', 'match-error');
+
+            if (confirmPassword.value === '') {
+                matchMessage.innerHTML = '';
+                return;
+            }
+
+            if (password.value === confirmPassword.value) {
+                confirmPassword.classList.add('is-valid');
+                matchMessage.classList.add('match-success', 'show');
+                matchMessage.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Passwords match';
+            } else {
+                confirmPassword.classList.add('is-invalid');
+                matchMessage.classList.add('match-error', 'show');
+                matchMessage.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> Passwords do not match';
+            }
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const msg = document.getElementById('msg');
+
+            if (password !== confirmPassword) {
+                msg.classList.remove('text-success');
+                msg.classList.add('text-danger');
+                msg.innerText = 'Passwords do not match.';
+                return;
+            }
+
+            fetch('auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'register',
+                    name: name,
+                    email: email,
+                    password: password
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        msg.classList.remove('text-danger');
+                        msg.classList.add('text-success');
+                        msg.innerText = 'Registration successful! Redirecting...';
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 1500);
+                    } else {
+                        msg.classList.remove('text-success');
+                        msg.classList.add('text-danger');
+                        msg.innerText = data.message;
+                    }
+                })
+                .catch(() => {
+                    msg.classList.remove('text-success');
+                    msg.classList.add('text-danger');
+                    msg.innerText = 'Server error.';
+                });
+        });
+    </script>
+
+</body>
+
+</html>

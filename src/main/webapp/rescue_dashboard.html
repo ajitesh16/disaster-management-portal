@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Rescue Team Dashboard - Disaster Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">Rescue Team Dashboard</a>
+            <div class="d-flex align-items-center gap-3">
+                <span id="userName" class="text-white fw-semibold"></span>
+                <button onclick="logout()" class="btn btn-outline-light btn-sm">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="card shadow border-0 rounded-4">
+            <div class="card-body">
+                <h2 class="card-title mb-3">Help Requests Needing Attention</h2>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle" id="helpTable">
+                        <thead class="table-warning">
+                            <tr>
+                                <th>ID</th>
+                                <th>Citizen</th>
+                                <th>Location</th>
+                                <th>Disaster Type</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function checkAuth() {
+            fetch('auth')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status !== 'success' || data.role !== 'RescueTeam') {
+                        window.location.href = 'login.html';
+                        return;
+                    }
+                    document.getElementById('userName').innerText = 'Welcome, Team ' + data.name;
+                });
+        }
+
+        function logout() {
+            fetch('auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'action=logout'
+            }).then(() => window.location.href = 'login.html');
+        }
+
+        function getStatusBadge(status) {
+            if (status === 'Pending') return '<span class="badge bg-secondary">Pending</span>';
+            if (status === 'Assigned') return '<span class="badge bg-info text-dark">Assigned</span>';
+            if (status === 'Resolved') return '<span class="badge bg-success">Resolved</span>';
+            if (status === 'In Progress') return '<span class="badge bg-warning text-dark">In Progress</span>';
+            return `<span class="badge bg-dark">${status}</span>`;
+        }
+
+        function loadRequests() {
+            fetch('help-request')
+                .then(r => r.json())
+                .then(data => {
+                    const rows = data.map(h => `
+                        <tr>
+                            <td>${h.id}</td>
+                            <td>${h.citizenName}</td>
+                            <td>${h.location}</td>
+                            <td>${h.disasterType}</td>
+                            <td>${h.description}</td>
+                            <td>${getStatusBadge(h.status)}</td>
+                            <td>
+                                <select class="form-select form-select-sm" onchange="updateStatus(${h.id}, this.value)">
+                                    <option value="Pending" ${h.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                    <option value="Assigned" ${h.status === 'Assigned' ? 'selected' : ''}>Assigned</option>
+                                    <option value="Resolved" ${h.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `).join('');
+
+                    document.getElementById('helpTable').innerHTML = `
+                        <thead class="table-warning">
+                            <tr>
+                                <th>ID</th>
+                                <th>Citizen</th>
+                                <th>Location</th>
+                                <th>Disaster Type</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    `;
+                });
+        }
+
+        function updateStatus(id, stat) {
+            fetch('help-request', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    action: 'update_status',
+                    id: id,
+                    status: stat
+                })
+            }).then(() => loadRequests());
+        }
+
+        window.onload = function () {
+            checkAuth();
+            loadRequests();
+        };
+    </script>
+
+</body>
+
+</html>

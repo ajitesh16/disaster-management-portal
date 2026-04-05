@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Management</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .navbar-inner {
+            background-color: #dc3545;
+            border-radius: 2px;
+        }
+
+        .map-btn:hover .instant-pill {
+            background-color: rgba(40, 167, 69, 0.15);
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.25);
+        }
+
+        .mini-feature {
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            height: 100%;
+            transition: all 0.35s ease;
+            text-align: left;
+        }
+
+        .mini-feature:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.14);
+        }
+
+        .feature-icon {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .mini-feature h6 {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .mini-feature .short-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .mini-feature .hover-text {
+            font-size: 0.88rem;
+            color: #495057;
+            margin-top: 10px;
+            opacity: 0;
+            max-height: 0;
+            transform: translateY(8px);
+            transition: 0.35s;
+        }
+
+        .mini-feature:hover .hover-text {
+            opacity: 1;
+            max-height: 120px;
+            transform: translateY(0);
+        }
+
+        /* Button hover polish */
+        .btn-outline-light:hover,
+        .btn-light:hover {
+            transform: translateY(-1px);
+            transition: 0.2s;
+        }
+
+        .map-btn {
+            transition: all 0.25s ease;
+            font-size: 0.95rem;
+        }
+
+        .map-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+        }
+
+        .map-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .instant-pill {
+            font-size: 0.72rem;
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1.5px solid #28a745;
+            background-color: rgba(40, 167, 69, 0.22);
+            color: #0f4f31;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .instant-pill:hover {
+            background-color: rgba(40, 167, 69, 0.3);
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.18);
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <!-- NAVBAR -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary p-0">
+            <div class="navbar-inner w-100 d-flex justify-content-between align-items-center px-4 py-3">
+
+                <a class="navbar-brand mb-0" href="#">Disaster Management</a>
+
+                <div>
+                    <a class="btn btn-outline-light me-2" href="login.html">Login</a>
+                    <a class="btn btn-light" href="register.html">Register</a>
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN -->
+    <main class="container text-center mt-5">
+
+        <h2 class="mb-4">Welcome to the Disaster Management Portal</h2>
+
+        <p class="lead">
+            Coordinate relief efforts, request help, and manage disasters efficiently.
+        </p>
+
+        <!-- MAP BUTTON -->
+        <div class="mt-4 d-flex flex-column align-items-center">
+            <a href="disaster_map.html" class="btn btn-primary map-btn px-4 py-2">
+                <span class="map-title">View Live Disaster Map</span>
+            </a>
+
+            <span class="instant-pill mt-2">
+                ⚡ Instant Access to Map without Sign-In
+            </span>
+        </div>
+
+        <!-- FEATURES -->
+        <div class="row mt-5 g-3">
+
+            <div class="col-md-4">
+                <div class="mini-feature">
+                    <div class="feature-icon">📍</div>
+                    <h6>Live Disaster Tracking</h6>
+                    <p class="short-text">View disasters across cities with real-time map updates.</p>
+                    <div class="hover-text">
+                        Monitor locations, severity levels, and disaster details directly from the live map.
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="mini-feature">
+                    <div class="feature-icon">🆘</div>
+                    <h6>Raise Help Requests</h6>
+                    <p class="short-text">Request food, water, and emergency support.</p>
+                    <div class="hover-text">
+                        Submit help requests and track response status efficiently.
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="mini-feature">
+                    <div class="feature-icon">🛠️</div>
+                    <h6>Admin Coordination</h6>
+                    <p class="short-text">Manage resources, assign teams, and track progress.</p>
+                    <div class="hover-text">
+                        Admin dashboard supports full disaster and response management.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white text-center mt-5 p-3">
+        <p class="mb-0">© 2026 Disaster Management System | Emergency Response Platform</p>
+    </footer>
+
+</body>
+
+</html>
