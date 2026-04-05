@@ -1,6 +1,6 @@
 # Disaster Management System 🌍
 
-A web application designed to streamline disaster reporting, response coordination, and resource management in real-time.
+A web application designed to streamline disaster reporting, response coordination, and resource management.
 
 ## 🎯 Purpose
 This system bridges the gap between citizens and disaster response teams by providing:
