@@ -33,3 +33,6 @@ Citizen:
 ## Project Status
 ✔ Cloud database integrated (Railway)  
 ✔ Ready for deployment
+
+## Live Demo
+https://disaster-management-portal-mp74.onrender.com/
